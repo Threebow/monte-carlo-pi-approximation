@@ -19,17 +19,19 @@ namespace Monte_Carlo_Pi_Approximation
 					continue;
 				}
 
+				//Let them know in case they forget.. or.. something.
+				Console.WriteLine("Calculating...");
+
 				//Calculate pi
 				double pi = CalculatePi(passes);
 
 				//Print it out
-				Console.WriteLine(pi);
+				Console.WriteLine($"Pi ({passes:n0} passes): {pi}");
 			}
 		}
 
 		private static double CalculatePi(int passes) {
-			//Create an array of our two-dimensional points
-			var points = new Point[passes];
+			int amountInCircle = 0;
 
 			//Go through our passes and generate points
 			for (int i = 0; i < passes; i++) {
@@ -37,12 +39,11 @@ namespace Monte_Carlo_Pi_Approximation
 				double x = rand.NextDouble();
 				double y = rand.NextDouble();
 
-				//Insert them into the two-dimensional array
-				points[i] = new Point(x, y);
+				//Add to the circle count if it's in the circle
+				if (IsInCircle(new Point(x, y)))
+					amountInCircle++;
 			}
 
-			//Count how many points landed in the circle
-			int amountInCircle = points.Count(IsInCircle);
 			return amountInCircle * 4d / passes;
 		}
 
