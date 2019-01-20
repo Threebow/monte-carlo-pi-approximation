@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 
 namespace Monte_Carlo_Pi_Approximation
