@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Monte_Carlo_Pi_Approximation
 {
 	class Program
 	{
-		private static readonly Random rand = new Random();
 		private const double center = 0.5d;
 		private const double centerSqr = center * center;
 
@@ -13,6 +15,7 @@ namespace Monte_Carlo_Pi_Approximation
 			while (true) {
 				//Get an int from the user
 				bool numeric = int.TryParse(Console.ReadLine(), out int passes);
+
 				if (!numeric) {
 					Console.WriteLine("Please enter an integer!");
 					continue;
@@ -21,11 +24,18 @@ namespace Monte_Carlo_Pi_Approximation
 				//Let them know in case they forget.. or.. something.
 				Console.WriteLine("Calculating...");
 
+				//Start a stopwatch so we can keep track of how long it takes
+				Stopwatch sw = Stopwatch.StartNew();
+
 				//Calculate pi
 				double pi = CalculatePi(passes);
 
-				//Print it out
+				//Stop the stopwatch
+				sw.Stop();
+
+				//Report the output back
 				Console.WriteLine($"Pi ({passes:n0} passes): {pi}");
+				Console.WriteLine($"Took: {Math.Round(sw.ElapsedMilliseconds / 1000d, 3)}s");
 			}
 		}
 
@@ -33,25 +43,26 @@ namespace Monte_Carlo_Pi_Approximation
 			int amountInCircle = 0;
 
 			//Go through our passes and generate points
-			for (int i = 0; i < passes; i++) {
+			Parallel.For(0, passes, i => {
 				//Generate random x and y coordinates
-				double x = rand.NextDouble();
-				double y = rand.NextDouble();
+				double x = TSRandom.NextDouble();
+				double y = TSRandom.NextDouble();
 
 				//Add to the circle count if it's in the circle
 				if (IsInCircle(x, y))
-					amountInCircle++;
-			}
+					Interlocked.Increment(ref amountInCircle);
+			});
 
 			return amountInCircle * 4d / passes;
 		}
 
 		private static bool IsInCircle(double x, double y) {
 			//Calculate the 2d distance between the point and the center point
-			double distance = (x-center)*(x-center)+(y-center)*(y-center);
+			double xc = x - center;
+			double yc = y - center;
 
 			//Check if it's within the radius of the circle
-			return distance <= centerSqr;
+			return xc * xc + yc * yc <= centerSqr;
 		}
 	}
 }
