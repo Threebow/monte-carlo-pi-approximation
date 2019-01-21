@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Windows;
 
 namespace Monte_Carlo_Pi_Approximation
 {
 	class Program
 	{
 		private static readonly Random rand = new Random();
-		private static readonly Point center = new Point(0.5f, 0.5f);
+		private const double center = 0.5d;
+		private const double centerSqr = center * center;
 
 		private static void Main() {
 			//Keep reading input
@@ -39,19 +39,19 @@ namespace Monte_Carlo_Pi_Approximation
 				double y = rand.NextDouble();
 
 				//Add to the circle count if it's in the circle
-				if (IsInCircle(new Point(x, y)))
+				if (IsInCircle(x, y))
 					amountInCircle++;
 			}
 
 			return amountInCircle * 4d / passes;
 		}
 
-		private static bool IsInCircle(Point point) {
+		private static bool IsInCircle(double x, double y) {
 			//Calculate the 2d distance between the point and the center point
-			double distance = Point.Subtract(point, center).Length;
+			double distance = (x-center)*(x-center)+(y-center)*(y-center);
 
 			//Check if it's within the radius of the circle
-			return distance <= 0.5d;
+			return distance <= centerSqr;
 		}
 	}
 }
